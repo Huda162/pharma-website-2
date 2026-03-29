@@ -44,7 +44,7 @@ export function CartDrawer() {
     }));
     try {
       const response = await axios.post(
-        `https://pharmaglows.com/adminv2/api/cart/check-stock`,
+        `https://pharmaglows.com/admin/api/cart/check-stock`,
         { items: cartItems }
       );
 
@@ -83,7 +83,7 @@ export function CartDrawer() {
     
     try {
       const response = await axios.post(
-        `https://pharmaglows.com/adminv2/api/cart/check-stock`,
+        `https://pharmaglows.com/admin/api/cart/check-stock`,
         { items: cartItems }
       );
 

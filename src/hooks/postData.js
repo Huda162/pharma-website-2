@@ -4,7 +4,7 @@ export default async function usePostData(url, data) {
   const token = JSON.parse(localStorage.getItem("alanaqa_access_token"))
   try {
     const response = await axios.post(
-      `https://pharmaglows.com/adminv2/api/${url}`,
+      `https://pharmaglows.com/admin/api/${url}`,
       data,
       {
         headers: {

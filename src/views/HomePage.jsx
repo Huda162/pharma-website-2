@@ -28,7 +28,7 @@ const HomePage = () => {
   const { data, loading } = useFetchData(url);
   const getSettings = async () => {
     try {
-      const url = `https://pharmaglows.com/adminv2/api/settings`;
+      const url = `https://pharmaglows.com/admin/api/settings`;
       const response = await fetch(url);
       const item = await response.json();
       item["settings"].forEach((element) => {
