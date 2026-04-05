@@ -187,56 +187,53 @@ export default function SubCategoriesPage() {
               {data && data.categories?.length > 0 && (
                 <>
                   <PageTitle title={t("SubCategories")} solid />
-                  <div className="breadcrumb-wrapper w-full mt-[30px]">
-                    <div className="categories-section-wrapper w-full mt-[30px]">
-                      <div className="container-x mx-auto">
-                        <div className="w-full categories-iems">
-                          <div className="grid xl:grid-cols-6 sm:grid-cols-4 grid-cols-2 gap-10 mb-[46px]">
-                            {data?.categories?.map((item, index) => (
-                              <Link
-                                to={`/sub-categories/${item.id}/${
-                                  lang === "ar"
-                                    ? item.name_ar
-                                    : lang === "en"
-                                    ? item.name_en
-                                    : item.name_he
-                                }`}
-                              >
-                                <div className="item w-full group cursor-pointer">
-                                  <div className="w-full flex justify-center">
-                                    <div className="w-[110px] h-[110px] rounded-full bg-[#EEF1F1] group-hover:bg-main-color mb-2.5 flex justify-center items-center">
-                                      <span className="text-qblack group-hover:text-white">
-                                        <img
-                                          src={item.image}
-                                          className="w-[100px] h-[100px]"
-                                          style={{ borderRadius: "50%" }}
-                                        />
-                                      </span>
-                                    </div>
-                                  </div>
-                                  <div className="w-full flex justify-center">
-                                    <p className="text-base text-qblack whitespace-nowrap ">
-                                      {lang === "ar"
-                                        ? item.name_ar
-                                        : lang === "en"
-                                        ? item.name_en
-                                        : item.name_he}
-                                    </p>
-                                  </div>
-                                </div>
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <div className="breadcrumb-wrapper w-full mt-[5px] ">
+  <div className="categories-section-wrapper w-full">
+    <div className="container-x mx-auto px-4">
+      <div className="flex gap-4 md:gap-6 pb-2 flex-wrap">
+        {data?.categories?.map((item, index) => (
+          <Link
+            key={item.id || index}
+            to={`/sub-categories/${item.id}/${
+              lang === "ar"
+                ? item.name_ar
+                : lang === "en"
+                ? item.name_en
+                : item.name_he
+            }`}
+            className="flex-shrink-0"
+          >
+            <div className="group flex flex-col items-center gap-1 w-[70px]">
+              {/* Small circle */}
+              <div className="w-[50px] h-[50px] rounded-full bg-gray-50 group-hover:bg-main-color transition-colors duration-200 flex items-center justify-center">
+                <img
+                  src={item.image}
+                  alt={lang === "ar" ? item.name_ar : lang === "en" ? item.name_en : item.name_he}
+                  className="w-[45px] h-[45px] rounded-full object-cover"
+                />
+              </div>
+              
+              {/* Small text */}
+              <p className="text-[11px] font-medium text-gray-600 group-hover:text-main-color text-center">
+                {lang === "ar"
+                  ? item.name_ar
+                  : lang === "en"
+                  ? item.name_en
+                  : item.name_he}
+              </p>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
                 </>
               )}
               <br />
               {/* <PageTitle title={t("CategoryProducts")} /> */}
               <PageTitle title={t("CategoryProducts")} solid />
-              {loadProducts ? (
+              {loading2 ? (
                 <div style={{ height: "100vh" }}>
                   <div className="flex space-x-2 justify-center items-center bg-white h-screen">
                     <span className="sr-only">Loading...</span>

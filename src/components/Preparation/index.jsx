@@ -24,7 +24,7 @@ export default function PreparationPage() {
     e.preventDefault();
     try {
       const response = await axios.get(
-        `https://pharmaglows.com/admin/api/suggest-baby-package?gender=${gender}&month=${birthMonth}`
+        `https://pharmaglows.com/adminv2/api/suggest-baby-package?gender=${gender}&month=${birthMonth}`
       );
       setSuggestionData(response.data);
       setShowSuggestions(true);

@@ -25,7 +25,7 @@ export default function LoginPage() {
 
     try {
       const response = await axios.post(
-        `https://pharmaglows.com/admin/api/login`,
+        `https://pharmaglows.com/adminv2/api/login`,
         {
           phone: phone,
           password: password,

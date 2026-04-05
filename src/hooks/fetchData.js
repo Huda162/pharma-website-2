@@ -7,7 +7,7 @@ export default function useFetchData(url) {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(`https://pharmaglows.com/admin/api/${url}`);
+      const response = await axios.get(`https://pharmaglows.com/adminv2/api/${url}`);
       setData(response.data);
     } catch (error) {
       console.log(error);

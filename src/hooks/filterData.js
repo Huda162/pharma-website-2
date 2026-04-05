@@ -11,7 +11,7 @@ export default function useFilterData(url) {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(`https://pharmaglows.com/admin/api/${url}`);
+      const response = await axios.get(`https://pharmaglows.com/adminv2/api/${url}`);
       if (!url.includes("max_price", 0) && !url.includes("min_price", 0)) {
         setMax(response?.data?.filters?.price_range?.max);
         setMin(response?.data?.filters?.price_range?.min);

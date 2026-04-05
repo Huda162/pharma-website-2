@@ -314,7 +314,12 @@ export default function ProductView({
             { name: t("Home Page"), path: "/" },
             from !== "products"
               ? {
-                  name: decoded,
+                  name:
+                    lang === "en"
+                      ? data?.product?.categories_data[0]?.name_en
+                      : lang === "ar"
+                      ? data?.product?.categories_data[0]?.name_ar
+                      : data?.product?.categories_data[0]?.name_hed,
                   path: `/sub-categories/${
                     data?.product?.categories_data[0]?.id
                   }/${
@@ -565,7 +570,12 @@ export default function ProductView({
                 { name: t("Home Page"), path: "/" },
                 from !== "products"
                   ? {
-                      name: decoded,
+                      name:
+                        lang === "en"
+                          ? data?.product?.categories_data[0]?.name_en
+                          : lang === "ar"
+                          ? data?.product?.categories_data[0]?.name_ar
+                          : data?.product?.categories_data[0]?.name_he,
                       path: `/sub-categories/${
                         data?.product?.categories_data[0]?.id
                       }/${

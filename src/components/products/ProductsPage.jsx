@@ -106,15 +106,6 @@ export default function ProductsPage() {
     if (sortKeys.sort_desc === true) {
       newUrl += `&sort_price=desc`;
     }
-    if (selectedSeasons) {
-      newUrl += `&season=${selectedSeasons}`;
-    }
-    if (selectedAgeGroups) {
-      newUrl += `&age=${selectedAgeGroups}`;
-    }
-    if (selectedGender) {
-      newUrl += `&gender=${selectedGender}`;
-    }
     setUrl(newUrl);
   };
 
@@ -122,9 +113,6 @@ export default function ProductsPage() {
     applyFilters();
   }, [
     currentPage,
-    selectedAgeGroups,
-    selectedSeasons,
-    selectedGender,
     sortKeys,
   ]);
 

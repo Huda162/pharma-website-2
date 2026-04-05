@@ -51,8 +51,10 @@ export default function BannersRow({ banners = [] }) {
   const getLink = (banner) => {
     if (banner.type === 'product' && banner.related_data) {
       return `/single-product/${banner.related_data.id}`;
+    } else if (banner.type === 'link'){
+      return banner.post_url
     }
-    return banner.link || "#";
+    return "#";
   };
 
   if (!banners.length) return null;
@@ -80,7 +82,7 @@ export default function BannersRow({ banners = [] }) {
   };
 
   return (
-    <div className="container-x mx-auto w-full pb-6 px-4 overflow-hidden md:hidden">
+    <div className="container-x mx-auto w-full pb-6 px-4 overflow-hidden ">
       <Slider {...settings}>
         {banners.map((banner, index) => (
           <div key={banner.id} className="px-2">
@@ -88,7 +90,8 @@ export default function BannersRow({ banners = [] }) {
               to={getLink(banner)} 
               className="block w-full bg-white shadow-md rounded-lg overflow-hidden flex flex-col h-full transition-all duration-300 ease-in-out transform hover:scale-[1.03] hover:shadow-xl"
             >
-              <div className="w-full h-[330px] xl:h-[400px] md:h-[350px] xl:bg-white mb relative overflow-hidden rounded-lg">
+              {/* Container with 4:5 aspect ratio */}
+              <div className="w-full relative overflow-hidden rounded-lg aspect-[4/5]">
                 <img
                   src={getImageUrl(banner)}
                   alt={getTitle(banner) || `Banner ${index + 1}`}

@@ -147,7 +147,7 @@ export default function CheakoutPage() {
     try {
       // API call using axios
       const response = await axios.post(
-        `https://pharmaglows.com/admin/api/copons/check`,
+        `https://pharmaglows.com/adminv2/api/copons/check`,
         { code: coupon },
         {
           headers: {
@@ -239,7 +239,7 @@ export default function CheakoutPage() {
     } else {
       try {
         const response = await axios.get(
-          `https://pharmaglows.com/admin/api/check_phone?phone=05${phone}`
+          `https://pharmaglows.com/adminv2/api/check_phone?phone=05${phone}`
         );
         console.log(response.data.message);
         if (response.data.message === "Phone number is available.") {
@@ -290,7 +290,7 @@ export default function CheakoutPage() {
     formData.append("role_id", 3);
 
     const resGet = await axios
-      .post(`https://pharmaglows.com/admin/api/register`, formData)
+      .post(`https://pharmaglows.com/adminv2/api/register`, formData)
       .then((response) => {
         login();
       })
@@ -384,7 +384,7 @@ export default function CheakoutPage() {
     try {
       const fullPhone = "05" + phone;
       const response = await axios.post(
-        `https://pharmaglows.com/admin/api/login`,
+        `https://pharmaglows.com/adminv2/api/login`,
         {
           phone: fullPhone,
           password: password,
