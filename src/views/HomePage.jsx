@@ -76,7 +76,11 @@ const HomePage = () => {
             seeMoreUrl="/all-categories"
             categoryTitle={t("Categories")}
           >
-            <CategoriesSection categories={data.categories?.slice(0, 12)} />
+            <CategoriesSection
+              categories={data.categories
+                ?.filter((category) => category.parent_id === 0)
+                .slice(0, 12)}
+            />
           </ViewMoreTitle>
 
           <ViewMoreTitle

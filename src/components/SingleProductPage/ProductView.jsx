@@ -319,7 +319,7 @@ export default function ProductView({
                       ? data?.product?.categories_data[0]?.name_en
                       : lang === "ar"
                       ? data?.product?.categories_data[0]?.name_ar
-                      : data?.product?.categories_data[0]?.name_hed,
+                      : data?.product?.categories_data[0]?.name_he,
                   path: `/sub-categories/${
                     data?.product?.categories_data[0]?.id
                   }/${
@@ -771,7 +771,7 @@ export default function ProductView({
                       >
                         <div
                           className={`
-                            w-16 h-16 rounded-lg overflow-hidden border-2 transition-all
+                            w-[2.25rem] h-[2.25rem] rounded-full overflow-hidden border-2 transition-all flex items-center justify-center
                             ${
                               isSelected
                                 ? "border-amber-600 shadow-md"
@@ -779,15 +779,12 @@ export default function ProductView({
                             }
                           `}
                         >
-                          <img
-                            src={item.color_image}
-                            className="w-full h-full object-cover"
-                            alt={t("Color variant")}
-                            onError={(e) => {
-                              e.target.onError = null;
-                              e.target.src = logo;
-                            }}
-                          />
+                            <div
+                              className={`h-[1.75rem] w-[1.75rem] rounded-full object-cover ${
+                                isOutOfStock ? "grayscale-[70%]" : ""
+                              }`}
+                              style={{ backgroundColor: item.color }}
+                            ></div>
                           {/* 
                           {isOutOfStock && (
                             <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
