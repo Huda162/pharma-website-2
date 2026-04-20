@@ -238,9 +238,9 @@ function ProductCardStyleThree({ datas, currentPage }) {
                     setDisplayedImage(color?.color_image);
                   }}
                   key={index}
-                  className="cursor-pointer xl:h-[35px] xl:w-[35px] md:h-[25px] md:w-[25px] border border-solid border-slate-300 flex rounded-full justify-center align-center mb-1 z-10"
+                  className="cursor-pointer xl:h-[30px] xl:w-[30px] md:h-[25px] md:w-[25px] border border-solid border-slate-300 flex rounded-full justify-center align-center mb-1 z-10"
                 >
-                  <img
+                  {/* <img
                     src={color?.color_image}
                     onError={(e) => {
                       e.target.onError = null;
@@ -248,7 +248,11 @@ function ProductCardStyleThree({ datas, currentPage }) {
                     }}
                     alt={`Product color ${index + 1}`}
                     className="xl:h-[33px] xl:w-[33px] md:h-[23px] md:w-[23x] h-[35px] w-[35px] rounded-full"
-                  />
+                  /> */}
+                  <div
+                    className={` xl:h-[28px] xl:w-[28px] md:h-[23px] md:w-[23x] h-[25px] w-[25px] rounded-full`}
+                    style={{ backgroundColor: color.color }}
+                  ></div>
                 </div>
               ))}
             </div>
