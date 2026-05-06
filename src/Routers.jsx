@@ -38,6 +38,8 @@ import Offers from "./components/OfferPage/index.jsx";
 import ProfilePage from "./components/profile/profile.jsx";
 import LoginPage from "./components/Login/login.jsx";
 import PreparationPage from "./components/Preparation/index.jsx";
+import Tranzila from "./components/CheakoutPage/Tranzila.jsx";
+import OrderSuccess from "./components/CheakoutPage/PaymentSuccess.jsx";
 export default function Routers() {
   return (
     <Routes>
@@ -76,6 +78,16 @@ export default function Routers() {
         exact
         path="/search-products/:value"
         element={<SearchProductPage />}
+      />
+      <Route
+        exact
+        path="/tranzila"
+        element={<Tranzila />}
+      />
+      <Route
+        exact
+        path="/order-success"
+        element={<OrderSuccess />}
       />
       {/* <Route
         exact

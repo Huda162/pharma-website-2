@@ -617,3 +617,262 @@ html, body {
   max-height: 100%;
   object-fit: contain;
 }
+
+/* Payment Method Section Styles */
+.payment-method-section {
+  margin-bottom: 24px;
+  padding: 0 20px;
+}
+
+.section-label {
+  display: block;
+  font-size: 13px;
+  font-weight: bold;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.required-star {
+  color: red;
+  font-size: 16px;
+  margin-right: 4px;
+}
+
+.payment-options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Payment Option Card */
+.payment-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.payment-option:hover {
+  border-color: #4CAF50;
+  background: #f9fff9;
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.15);
+}
+
+.payment-option.selected {
+  border-color: #4CAF50;
+  background: linear-gradient(135deg, #f0fff4 0%, #e8f5e9 100%);
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+}
+
+/* Radio Button Custom Styling */
+.radio-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.custom-radio {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.radio-custom {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  background: white;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.payment-option:hover .radio-custom {
+  border-color: #4CAF50;
+  transform: scale(1.1);
+}
+
+.payment-option.selected .radio-custom {
+  border-color: #4CAF50;
+  background: #4CAF50;
+}
+
+.radio-inner {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: white;
+  animation: radioPop 0.3s ease;
+}
+
+@keyframes radioPop {
+  0% {
+    transform: scale(0);
+  }
+  80% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Option Content */
+.option-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.option-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.payment-option.selected .option-icon {
+  background: #4CAF50;
+  color: white;
+}
+
+.option-icon svg {
+  width: 24px;
+  height: 24px;
+  transition: all 0.3s ease;
+}
+
+.option-text {
+  flex: 1;
+}
+
+.option-text h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 4px 0;
+  transition: color 0.3s ease;
+}
+
+.option-text p {
+  font-size: 12px;
+  color: #888;
+  margin: 0;
+  transition: color 0.3s ease;
+}
+
+.payment-option.selected .option-text h4 {
+  color: #2e7d32;
+}
+
+.payment-option.selected .option-text p {
+  color: #666;
+}
+
+/* Selected Badge */
+.selected-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 40px 40px 0;
+  border-color: transparent #4CAF50 transparent transparent;
+  animation: slideIn 0.4s ease;
+}
+
+.selected-badge svg {
+  position: absolute;
+  top: 6px;
+  right: -32px;
+  width: 16px;
+  height: 16px;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .payment-option {
+    padding: 16px;
+  }
+  
+  .option-icon {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .option-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .option-text h4 {
+    font-size: 14px;
+  }
+  
+  .option-text p {
+    font-size: 11px;
+  }
+  
+  .selected-badge {
+    border-width: 0 30px 30px 0;
+  }
+  
+  .selected-badge svg {
+    top: 4px;
+    right: -24px;
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* Hover effect for the entire section */
+.payment-option:active {
+  transform: scale(0.98);
+}
+
+/* Focus styles for accessibility */
+.custom-radio:focus + .radio-custom {
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.3);
+}
+
+/* Animation for selection */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.payment-option.selected {
+  animation: pulse 0.3s ease;
+}

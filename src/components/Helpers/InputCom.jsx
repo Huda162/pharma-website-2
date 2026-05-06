@@ -20,14 +20,43 @@ export default function InputCom({
   isPhone = false,
   isCode = false,
   isLoading = true,
+  direction, 
+  textAlign, 
 }) {
   const lang = localStorage.getItem("i18nextLng");
+  
+  // Determine text direction
+  const getTextDirection = () => {
+    if (direction) return direction;
+    // Auto-detect based on language
+    if (lang === "ar") return "rtl";
+    if (lang === "en" || lang === "he") return "ltr";
+    return "auto";
+  };
+  
+  // Determine text alignment
+  const getTextAlign = () => {
+    if (textAlign) return textAlign;
+    // Auto-detect based on language
+    if (lang === "ar") return "right";
+    if (lang === "en") return "left";
+    if (lang === "he") return "right";
+    return "left";
+  };
+  
+  const textDirection = getTextDirection();
+  const textAlignment = getTextAlign();
+  
   return (
     <div className="input-com w-full h-full">
       {label && (
         <label
           className={`input-label capitalize block mb-2 ${labelClasses}`}
           htmlFor={name}
+          style={{ 
+            textAlign: textAlignment,
+            direction: textDirection 
+          }}
         >
           {label}{" "}
           {required && (
@@ -39,6 +68,7 @@ export default function InputCom({
         className={`input-wrapper border ${
           isEmpty ? "bg-[#faeaeb]" : isFill ? "bg-[#ddf9e2]" : "border-gray-400"
         } w-full h-[30px] overflow-hidden relative rounded`}
+        style={{ direction: textDirection }}
       >
         {isEmpty ? (
           <div className="absolute top-0 right-0 flex items-center h-full px-2 text-gray-600 text-[13px]">
@@ -55,7 +85,6 @@ export default function InputCom({
                 d="M6 18 18 6M6 6l12 12"
               />
             </svg>
-            {/* {placeholder} */}
           </div>
         ) : (
           ""
@@ -76,12 +105,9 @@ export default function InputCom({
                 d="m4.5 12.75 6 6 9-13.5"
               />
             </svg>
-
-            {/* {placeholder} */}
           </div>
         ) : isCode ? (
           <>
-            {" "}
             <div className="absolute left-0 flex items-center justify-center mx-1 h-full w-[10%]">
               {isLoading && (
                 <div className="w-[100%] h-full flex items-center justify-center">
@@ -100,6 +126,10 @@ export default function InputCom({
               type={type}
               id={name}
               placeholder={isEmpty ? placeholder : ""}
+              style={{
+                direction: textDirection,
+                textAlign: textAlignment
+              }}
             />
           </>
         ) : (
@@ -109,25 +139,27 @@ export default function InputCom({
           <div
             className={`input-field ${
               isEmpty ? "bg-[#faeaeb]" : isFill ? "bg-[#ddf9e2]" : " bg-white"
-            } placeholder:text-sm flex items-center text-sm px-6 text-dark-gray w-full h-full font-normal focus:ring-0 focus:outline-none flex ${
-              lang === "en" && "flex-row-reverse"
-            } ${inputClasses || ""}`}
+            } placeholder:text-sm flex items-center text-sm px-6 text-dark-gray w-full h-full font-normal focus:ring-0 focus:outline-none ${
+              inputClasses || ""
+            }`}
+            style={{ direction: textDirection }}
           >
             <input
               value={value}
               onChange={inputHandler}
               className={`input-field ${
                 isEmpty ? "bg-[#faeaeb]" : isFill ? "bg-[#ddf9e2]" : " bg-white"
-              } placeholder:text-sm ${
-                lang === "en" ? "text-start" : "text-end"
-              } text-sm px-4 text-dark-gray w-full h-full font-normal focus:ring-0 focus:outline-none ${
+              } placeholder:text-sm text-sm px-4 text-dark-gray w-full h-full font-normal focus:ring-0 focus:outline-none ${
                 inputClasses || ""
               }`}
               type={type}
               id={name}
               placeholder={isEmpty ? placeholder : ""}
+              style={{
+                direction: textDirection,
+                textAlign: textAlignment
+              }}
             />
-
             <div
               className={`border-r border-qgray ${
                 lang === "en" ? "ps-0 pe-4" : "ps-4 pe-0"
@@ -148,6 +180,10 @@ export default function InputCom({
             type={type}
             id={name}
             placeholder={isEmpty ? placeholder : ""}
+            style={{
+              direction: textDirection,
+              textAlign: textAlignment
+            }}
           />
         )}
         {children && children}

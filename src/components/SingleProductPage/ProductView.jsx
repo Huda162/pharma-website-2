@@ -772,19 +772,18 @@ export default function ProductView({
                         <div
                           className={`
                             w-[2.25rem] h-[2.25rem] rounded-full overflow-hidden border-2 transition-all flex items-center justify-center
-                            ${
+                         ${
                               isSelected
                                 ? "border-amber-600 shadow-md"
                                 : "border-gray-200 hover:border-amber-300"
                             }
                           `}
                         >
-                            <div
-                              className={`h-[1.75rem] w-[1.75rem] rounded-full object-cover ${
-                                isOutOfStock ? "grayscale-[70%]" : ""
-                              }`}
-                              style={{ backgroundColor: item.color }}
-                            ></div>
+                          <div
+                            className={`h-[1.75rem] w-[1.75rem] rounded-full object-cover 
+                            `}
+                            style={{ backgroundColor: item.color }}
+                          ></div>
                           {/* 
                           {isOutOfStock && (
                             <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
@@ -794,6 +793,7 @@ export default function ProductView({
                             </div>
                           )} */}
                         </div>
+                        <span className="text-xs">{item.color_code}</span>
                       </button>
                     );
                   })}

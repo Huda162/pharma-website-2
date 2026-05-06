@@ -70,6 +70,7 @@ const notifyError = () =>
       textAlign: "center",
     },
   });
+
 export default function CheakoutPage() {
   const dispatch = useDispatch();
   const [markerPosition, setMarkerPosition] = useState({ lng: 0, lat: 0 });
@@ -79,12 +80,6 @@ export default function CheakoutPage() {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: "AIzaSyCbU4UQT_reh3zLwsTZDYLmRrpseZQUGfw" || "",
   });
-  // const handleMapClick = (event) => {
-  //   setMarkerPosition({
-  //     lng: event.latLng.lng(),
-  //     lat: event.latLng.lat(),
-  //   });
-  // };
 
   const lang = localStorage.getItem("i18nextLng");
 
@@ -124,6 +119,9 @@ export default function CheakoutPage() {
   const [discount, setDiscount] = useState(0);
   const [loadCode, setLoadCode] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
+  
+  // New state for payment method
+  const [paymentMethod, setPaymentMethod] = useState("visa"); // 'cash' or 'card'
 
   const handleCodeChange = (e) => {
     const value = e.target.value;
@@ -141,11 +139,11 @@ export default function CheakoutPage() {
 
     setDebounceTimeout(newTimeout);
   };
+  
   const token = JSON.parse(localStorage.getItem("alanaqa_access_token"));
 
   const checkCoupon = async (coupon) => {
     try {
-      // API call using axios
       const response = await axios.post(
         `https://pharmaglows.com/adminv2/api/copons/check`,
         { code: coupon },
@@ -181,10 +179,8 @@ export default function CheakoutPage() {
         setDiscount(0);
         setCoponId(0);
       } else {
-        // Other errors (network or server)
         setDiscount(0);
         setCoponId(0);
-
         setValidationMessage("An error occurred. Please try again later.");
       }
     }
@@ -194,7 +190,6 @@ export default function CheakoutPage() {
   const handleChangePhone = (e) => {
     const inputValue = e.target.value;
 
-    // Allow only numeric characters and limit length to 8
     if (/^\d*$/.test(inputValue) && inputValue.length <= 8) {
       setPhone(inputValue);
     }
@@ -208,8 +203,11 @@ export default function CheakoutPage() {
     }
   };
 
+  // Updated handleSubmitOrder to handle payment method
   const handleSubmitOrder = async () => {
-    setLoadingSubmit(true)
+    setLoadingSubmit(true);
+    
+    // Validate required fields
     const requiredFields = [];
     if (!name) {
       requiredFields.push(t("Name"));
@@ -231,30 +229,32 @@ export default function CheakoutPage() {
       requiredFields.push(t("Area (Interior, Jerusalem, West Bank)"));
       setEmptyShippingCost(true);
     }
+    
     if (requiredFields.length > 0) {
-      const errorMessage = `${t(
-        "Please fill out the following fields"
-      )}   : ${requiredFields.join(", ")}`;
+      const errorMessage = `${t("Please fill out the following fields")}   : ${requiredFields.join(", ")}`;
       setErrorMessage(errorMessage);
-    } else {
-      try {
-        const response = await axios.get(
-          `https://pharmaglows.com/adminv2/api/check_phone?phone=05${phone}`
-        );
-        console.log(response.data.message);
-        if (response.data.message === "Phone number is available.") {
-          handleAddAccount();
+      setLoadingSubmit(false);
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        `https://pharmaglows.com/adminv2/api/check_phone?phone=05${phone}`
+      );
+      console.log(response.data.message);
+      if (response.data.message === "Phone number is available.") {
+        handleAddAccount();
+      } else {
+        setPhoneExist(true);
+        if (log_status === "true") {
+          await handleAddOrder();
         } else {
-          setPhoneExist(true);
-          if (log_status === "true") {
-            handleAddOrder();
-          } else {
-            login();
-          }
+          login();
         }
-      } catch (error) {
-        console.log(error);
       }
+    } catch (error) {
+      console.log(error);
+      setLoadingSubmit(false);
     }
   };
 
@@ -296,11 +296,13 @@ export default function CheakoutPage() {
       })
       .catch((err) => {
         console.error(err);
+        setLoadingSubmit(false);
       });
   };
 
-  const handleAddOrder = async () => {
-    setLoadingSubmit(true)
+  // Updated handleAddOrder to accept payment method and return order data
+  const handleAddOrder = async (paymentMethodType = paymentMethod) => {
+    setLoadingSubmit(true);
     const fullPhone = "05" + phone;
 
     localStorage.setItem("form_phone", phone);
@@ -309,19 +311,24 @@ export default function CheakoutPage() {
     localStorage.setItem("form_area", area);
     localStorage.setItem("form_near", near);
     localStorage.setItem("form_shippingcost", JSON.stringify(shippingCost));
+    
     const formData = new FormData();
     const sum = cart?.reduce(
       (acc, item) => acc + item.price_nis_retail * item.quantity,
       0
     );
 
-    formData.append("phone", fullPhone);
-    formData.append("customer_name", name);
     formData.append("city", city);
+    formData.append("customer_name", name);
+    formData.append("phone", fullPhone);
+    formData.append("geoarea", shippingCost.text);
+    formData.append("delivery_price", shippingCost.price);
     formData.append("area", area);
     formData.append("near", near);
     formData.append("note", note);
     formData.append("user_id", JSON.parse(localStorage.getItem("alanaqa_id")));
+    formData.append("payment_method", paymentMethodType); // Add payment method to order
+    
     if (markerPosition && markerPosition.lat && markerPosition.lng) {
       formData.append("lattitude", markerPosition.lat);
       formData.append("longitude", markerPosition.lng);
@@ -329,13 +336,11 @@ export default function CheakoutPage() {
       formData.append("lattitude", "0");
       formData.append("longitude", "0");
     }
-    formData.append("geoarea", shippingCost.text);
-    formData.append("area_id", shippingCost.id);
-    formData.append("delivery_price", shippingCost.price);
-    formData.append("customer_name", name);
-    formData.append("sum", sum);
     formData.append("coupon_id", coponId);
     formData.append("source", "website");
+    formData.append("sum", sum);
+    formData.append("area_id", shippingCost.id);
+    formData.append("customer_name", name);
 
     cart?.forEach((element, index) => {
       formData.append(`product_id[${index}]`, element.id);
@@ -348,31 +353,76 @@ export default function CheakoutPage() {
     });
 
     try {
-      const resposne = await usePostData("add_order", formData);
-      dispatch(clearCart());
-      setPhone("");
-      setArea("");
-      setCity("");
-      setNear("");
-      setNote("");
-      setName("");
-      {
+      const response = await usePostData("add_order", formData);
+      
+      // Calculate total amount
+      const total = cart?.reduce(
+        (acc, item) => acc + item.price_nis_retail * item.quantity,
+        0
+      ) - discount + Number(shippingCost.price);
+      
+      const orderResult = {
+        order: response,
+        total: total,
+        orderId: response.id || response.order_id,
+        customer_name: name,
+        phone: fullPhone,
+        email: user?.email || "",
+        order_details: cart,
+        city: city,
+        area: area,
+        near: near,
+        geoarea: shippingCost.text,
+        delivery_price: shippingCost.price,
+        discount: discount,
+        coupon_id: coponId
+      };
+
+      // Handle navigation based on payment method
+      if (paymentMethodType === "cash") {
+        // Cash payment - clear cart and go to homepage
+        dispatch(clearCart());
+        setLoadingSubmit(false);
+        
+        // Show success notification
         lang === "ar"
           ? notifyConfirmOrderAr()
           : lang === "en"
           ? notifyConfirmOrderEn()
           : notifyConfirmOrderHe();
+        
+        // Navigate to homepage
+        navigate("/");
+      } 
+      else if (paymentMethodType === "visa") {
+        // Card payment - store order in sessionStorage and navigate to Tranzila
+        sessionStorage.setItem("pendingOrder", JSON.stringify({ 
+          result: orderResult, 
+          total: total 
+        }));
+        
+        setLoadingSubmit(false);
+        
+        // Navigate to Tranzila payment page
+        navigate("/tranzila", { 
+          state: { 
+            result: orderResult, 
+            total: total 
+          } 
+        });
       }
-      navigate("/");
+      
+      return orderResult;
+      
     } catch (error) {
       console.log(error);
-      {
-        lang === "ar"
-          ? notifyNotConfirmOrderAr()
-          : lang === "en"
-          ? notifyNotConfirmOrderEn()
-          : notifyNotConfirmOrderHe();
-      }
+      setLoadingSubmit(false);
+      lang === "ar"
+        ? notifyNotConfirmOrderAr()
+        : lang === "en"
+        ? notifyNotConfirmOrderEn()
+        : notifyNotConfirmOrderHe();
+      throw error;
     }
   };
 
@@ -393,7 +443,6 @@ export default function CheakoutPage() {
       );
       console.log(response);
       if (response.status === 200) {
-        // Successful login
         const token = response.data.access_token;
         const status = response.data.status;
         const { name, id } = response.data.id;
@@ -401,14 +450,15 @@ export default function CheakoutPage() {
         localStorage.setItem("alanaqa_name", JSON.stringify(name));
         localStorage.setItem("alanaqa_id", JSON.stringify(id));
         localStorage.setItem("alanaqa_log_status", JSON.stringify(status));
-        handleAddOrder();
+        await handleAddOrder();
       } else {
         console.log("Invalid login details");
+        setLoadingSubmit(false);
       }
     } catch (error) {
       console.error(error);
+      setLoadingSubmit(false);
     }
-    // }
   };
 
   const handleClickGetLocation = () => {
@@ -443,7 +493,21 @@ export default function CheakoutPage() {
     });
     setEmptyShippingCost(false);
   };
+  
   console.log(shippingCost);
+
+  // Calculate totals for display
+  const subtotal = cart?.reduce(
+    (acc, item) => acc + item.price_nis_retail * item.quantity,
+    0
+  );
+  
+  const totalAfterDiscount = subtotal - discount;
+  const finalTotal = totalAfterDiscount + (shippingCost?.price || 0);
+  
+  // Get user from localStorage if exists
+  const user = JSON.parse(localStorage.getItem("alanaqa_id")) ? 
+    { id: JSON.parse(localStorage.getItem("alanaqa_id")) } : null;
 
   return (
     <LayoutHomeTwo childrenClasses="pt-0 pb-0">
@@ -533,6 +597,7 @@ export default function CheakoutPage() {
                             </option>
                             {data?.areas?.map((area) => (
                               <option
+                                key={area?.id}
                                 value={area?.id}
                                 data-price={area.delivery_price}
                               >
@@ -601,7 +666,6 @@ export default function CheakoutPage() {
                       <div className="sm:w-full mb-5 sm:mb-0 xl:ml-[20px]">
                         <InputCom
                           label={t("Copon Code")}
-                          // placeholder={t("copon code")}
                           inputClasses="w-full h-[70px]"
                           name="copon"
                           value={coponCode}
@@ -626,6 +690,79 @@ export default function CheakoutPage() {
                         )}
                       </div>
                     </div>
+                    
+                  {/* Payment Method Selection - Using existing classes */}
+<div className="mb-6 xl:ml-[20px]">
+  <label className="text-qgray text-[13px] font-bold block mb-2">
+    <span style={{ color: "red", fontSize: "1rem" }}>*</span>
+    {t("Payment Method")}
+  </label>
+  
+  <div className="flex flex-col space-y-3">
+    {/* Credit Card Option */}
+    <label 
+      className={`border-2 p-4 rounded-lg cursor-pointer transition-all flex items-center gap-3 ${
+        paymentMethod === "visa" 
+          ? "border-green-500 bg-green-50" 
+          : "border-gray-300 hover:border-green-300 bg-white"
+      }`}
+    >
+      <input
+        type="radio"
+        name="paymentMethod"
+        value="visa"
+        checked={paymentMethod === "visa"}
+        onChange={(e) => setPaymentMethod(e.target.value)}
+        className="w-4 h-4 text-green-600 focus:ring-green-500"
+      />
+      <div className="flex-1">
+        <span className={`font-medium ${paymentMethod === "visa" ? "text-green-700" : "text-qblack"}`}>
+          {t("Credit Card / Bit")}
+        </span>
+        <p className="text-xs text-qgray mt-1">
+          {t("Pay securely with credit card or Bit")}
+        </p>
+      </div>
+      {paymentMethod === "visa" && (
+        <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+        </svg>
+      )}
+    </label>
+
+    {/* Cash on Delivery Option */}
+    <label 
+      className={`border-2 p-4 rounded-lg cursor-pointer transition-all flex items-center gap-3 ${
+        paymentMethod === "cash" 
+          ? "border-green-500 bg-green-50" 
+          : "border-gray-300 hover:border-green-300 bg-white"
+      }`}
+    >
+      <input
+        type="radio"
+        name="paymentMethod"
+        value="cash"
+        checked={paymentMethod === "cash"}
+        onChange={(e) => setPaymentMethod(e.target.value)}
+        className="w-4 h-4 text-green-600 focus:ring-green-500"
+      />
+      <div className="flex-1">
+        <span className={`font-medium ${paymentMethod === "cash" ? "text-green-700" : "text-qblack"}`}>
+          {t("Cash on Delivery")}
+        </span>
+        <p className="text-xs text-qgray mt-1">
+          {t("Pay when you receive your order")}
+        </p>
+      </div>
+      {paymentMethod === "cash" && (
+        <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+        </svg>
+      )}
+    </label>
+  </div>
+</div>
+                    
                     <div className="flex-1 ml-4">
                       <div className="mb-5">
                         <h6 className="text-qgray text-[13px] font-bold ">
@@ -663,7 +800,7 @@ export default function CheakoutPage() {
                   <div className="product-list w-full mb-[30px]">
                     <ul className="flex flex-col space-y-5">
                       {cart?.map((item, index) => (
-                        <li>
+                        <li key={index}>
                           <div className="flex justify-between items-center">
                             <div>
                               <h4 className="text-[15px] text-qblack mb-2.5">
@@ -692,77 +829,47 @@ export default function CheakoutPage() {
                   <div className="mt-[30px]">
                     <div className=" flex justify-between mb-5">
                       <p className="text-2xl font-medium text-qblack">
-                        {t("Total")}
+                        {t("Subtotal")}
                       </p>
                       <p className="text-2xl font-medium text-qred">
-                        ₪
-                        {cart?.reduce(
-                          (acc, item) =>
-                            acc + item.price_nis_retail * item.quantity,
-                          0
-                        )}
+                        ₪{subtotal.toFixed(2)}
                       </p>
                     </div>
                   </div>
                   <div className="w-full h-[1px] bg-[#EDEDED]"></div>
                   <div className="mt-[30px]">
-                    {/* {shippingCost && ( */}
+                    <div className=" flex justify-between mb-5">
+                      <p className="text-xl font-medium text-qblack">
+                        {t("Discount")}
+                      </p>
+                      <p className="text-2xl font-medium text-green-600">
+                        -₪{discount.toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="w-full h-[1px] bg-[#EDEDED]"></div>
+                  <div className="mt-[30px]">
                     <div className=" flex justify-between mb-5">
                       <p className="text-xl font-medium text-qblack">
                         {t("Delivery price")}
                       </p>
-
-                      <br />
-
                       <p className="text-2xl font-medium text-qred">
-                        ₪{shippingCost.price}
+                        ₪{shippingCost?.price?.toFixed(2) || "0"}
                       </p>
                     </div>
-                    {/* )} */}
                   </div>
                   <div className="w-full h-[1px] bg-[#EDEDED]"></div>
                   <div className="mt-[30px]">
-                    {/* {shippingCost && ( */}
                     <div className=" flex justify-between mb-5">
-                      <p className="text-xl font-medium text-qblack">
-                        {t("discount")}
+                      <p className="text-xl font-medium text-qblack font-bold">
+                        {t("Total")}
                       </p>
-                      <br />
-
-                      <p className="text-2xl font-medium text-qred">
-                        {" "}
-                        -₪{discount}
+                      <p className="text-2xl font-medium text-qred font-bold">
+                        ₪{finalTotal.toFixed(2)}
                       </p>
                     </div>
-                    {/* )} */}
                   </div>
-                  <div className="w-full h-[1px] bg-[#EDEDED]"></div>
-                  <div className="mt-[30px]">
-                    {shippingCost && (
-                      <div className=" flex justify-between mb-5">
-                        <p className="text-xl font-medium text-qblack">
-                          {t("Total price of the order")}
-                        </p>
-                        <br />
-                        <p className="text-sm font-medium text-qblack">
-                          {t("Total")} +{t("Delivery price")}
-                        </p>
-                        <p className="text-2xl font-medium text-qred">
-                          {" "}
-                          ₪
-                          {(
-                            cart?.reduce(
-                              (acc, item) =>
-                                acc + item.price_nis_retail * item.quantity,
-                              0
-                            ) -
-                            discount +
-                            Number(shippingCost.price)
-                          ).toFixed(2)}
-                        </p>
-                      </div>
-                    )}
-                  </div>
+                  
                   {errorMessage && (
                     <div
                       className="mb-[30px]"
@@ -779,7 +886,17 @@ export default function CheakoutPage() {
                       {t("phone number must start with 05")}
                     </div>
                   )}
-                   <button
+                  
+                  {/* Payment Method Info Box */}
+                  <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+                    <p className="text-sm text-blue-800">
+                      {paymentMethod === "cash" 
+                        ? t("You will pay cash upon delivery. Order will be confirmed immediately.")
+                        : t("You will be redirected to secure payment page to complete your transaction.")}
+                    </p>
+                  </div>
+                  
+                  <button
                     className={`w-full h-[50px] ${
                       loadingSubmit ? "bg-qgray" : "black-btn"
                     } flex justify-center items-center cursor-pointer`}
@@ -787,13 +904,12 @@ export default function CheakoutPage() {
                     disabled={loadingSubmit}
                   >
                     <span className="text-sm font-semibold">
-                      {" "}
                       {loadingSubmit ? (
                         <>
                           <Spinner />
                         </>
                       ) : (
-                        <>{t("Confirmation")}</>
+                        <>{paymentMethod === "cash" ? t("Confirm Order") : t("Proceed to Payment")}</>
                       )}
                     </span>
                   </button>
@@ -803,7 +919,7 @@ export default function CheakoutPage() {
           </div>
         </div>
       </div>
-      {/* <ToastContainer /> */}
+      
       <Dialog
         open={isPasswordDialogOpen}
         onClose={() => setIsPasswordDialogOpen(false)}
@@ -854,7 +970,6 @@ export default function CheakoutPage() {
             style={{
               marginTop: "1rem",
               width: "25%",
-
               padding: "0.5rem",
             }}
           >
@@ -881,7 +996,6 @@ export default function CheakoutPage() {
             style={{
               backgroundColor: "#1d1d1d",
               marginTop: "1rem",
-              // width: "70%",
               color: "white",
               padding: "0.5rem",
               cursor: "pointer",
@@ -900,7 +1014,6 @@ export default function CheakoutPage() {
             style={{
               marginTop: "1rem",
               width: "25%",
-
               padding: "0.5rem",
             }}
           >
