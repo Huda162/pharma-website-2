@@ -19,6 +19,7 @@ export default function Footer() {
             <Link to="/">
               <img src={logo} alt="logo" className="max-w-[180px] w-full" />
             </Link>
+
           </div>
 
           <div className="text-center lg:text-start">
@@ -80,6 +81,8 @@ export default function Footer() {
                   </span>
                 </Link>
               </li>
+             
+              
             </ul>
           </div>
 
@@ -118,6 +121,7 @@ export default function Footer() {
               ©{new Date().getFullYear()} {t("All rights reserved")}
             </span>
           </div>
+          {t("עולם פרפש בע״מ")}
 
           <span className="text-[12px] sm:text-base text-black">
             <a
